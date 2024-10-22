@@ -1,5 +1,6 @@
 package lk.auroraskincare.clinic.config;
 
+import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.*;
@@ -95,16 +96,27 @@ public class AppointmentApp {
     private static void makeAppointment(Scanner scanner) {
         System.out.print("Enter patient name: ");
         String name = scanner.nextLine();
+        System.out.print("Enter patient NIC: ");
+        String nic = scanner.nextLine();
         System.out.print("Enter patient email: ");
         String email = scanner.nextLine();
+        System.out.print("Enter patient phone number: ");
+        String phone = scanner.nextLine();
         System.out.print("Enter appointment date (YYYY-MM-DD): ");
         LocalDate date = LocalDate.parse(scanner.nextLine());
-        System.out.print("Available consultation times:");
+
+        System.out.print("Available consultation times:\n");
         for (ConsultationTime time : ConsultationTime.values()) {
             System.out.println(time.getTimeSlot());
         }
+
         System.out.print("Enter appointment time (HH:mm): ");
         LocalTime time = LocalTime.parse(scanner.nextLine());
+
+        if (!validateConsultationTime(date.getDayOfWeek(), time)) {
+            System.out.println("Error: The selected date and time do not match any available consultation times.");
+            return;
+        }
 
         System.out.println("Select a dermatologist:");
         for (DermatologistEntity dermatologist : dermatologists) {
@@ -133,7 +145,9 @@ public class AppointmentApp {
         PatientEntity patient = new PatientEntity();
         patient.setId(patientIdCounter++);
         patient.setName(name);
+        patient.setNic(nic);
         patient.setEmail(email);
+        patient.setPhone(phone);
         patients.add(patient);
 
         AppointmentEntity appointment = new AppointmentEntity();
@@ -146,6 +160,22 @@ public class AppointmentApp {
         appointments.add(appointment);
 
         System.out.println("Appointment made successfully.");
+    }
+
+    private static boolean validateConsultationTime(DayOfWeek dayOfWeek, LocalTime time) {
+        for (ConsultationTime consultationTime : ConsultationTime.values()) {
+            if (consultationTime.name().equals(dayOfWeek.name()) &&
+                (time.equals(consultationTime.getStartTime()) || time.equals(consultationTime.getEndTime()) ||
+                (time.isAfter(consultationTime.getStartTime()) && time.isBefore(consultationTime.getEndTime())))) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private static LocalTime convertTo24HourTime(String time) {
+        LocalTime localTime = LocalTime.parse(time);
+        return localTime; // Time is already in 24-hour format.
     }
 
     private static void addTreatment(Scanner scanner) {
