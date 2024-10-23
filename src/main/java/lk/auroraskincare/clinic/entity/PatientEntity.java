@@ -16,14 +16,12 @@ import jakarta.persistence.Table;
 
 @Entity
 @Table(name = "patient")
-public class PatientEntity {
+public class PatientEntity extends UserEntity{
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "patientId")
     private Long id;
-
-    private String name;
 
     private String email;
 
@@ -41,14 +39,6 @@ public class PatientEntity {
 
     public void setId(Long id) {
         this.id = id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
     }
 
     public String getEmail() {
@@ -75,7 +65,21 @@ public class PatientEntity {
         this.phone = phone;
     }
 
+    // @Override
+    // public String getDetails() {
+    //     return "Patient details: Name: " + ", NIC: " + nic;
+    // }
+
     
+    // @Override
+    // public String getName() {
+    //     return name;
+    // }
+
+    // @Override
+    // public String getNIC() {
+    //     return nic;
+    // }
     
 }
 
