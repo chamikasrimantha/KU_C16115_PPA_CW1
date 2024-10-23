@@ -3,6 +3,7 @@ package lk.auroraskincare.clinic.config;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.time.format.DateTimeParseException;
 import java.util.*;
 
 import org.springframework.stereotype.Component;
@@ -118,14 +119,45 @@ public class AppointmentApp {
     private static void makeAppointment(Scanner scanner) {
         System.out.print("Enter patient name: ");
         String name = scanner.nextLine();
+        if (name.isEmpty()) {
+            System.out.println("Error: Patient name cannot be empty.");
+            return;
+        }
+
         System.out.print("Enter patient NIC: ");
         String nic = scanner.nextLine();
+        if (nic.isEmpty()) {
+            System.out.println("Error: Patient NIC cannot be empty.");
+            return;
+        }
+
         System.out.print("Enter patient email: ");
         String email = scanner.nextLine();
+        if (email.isEmpty()) {
+            System.out.println("Error: Patient email cannot be empty.");
+            return;
+        }
+
         System.out.print("Enter patient phone number: ");
         String phone = scanner.nextLine();
+        if (phone.isEmpty()) {
+            System.out.println("Error: Patient phone number cannot be empty.");
+            return;
+        }
+
         System.out.print("Enter appointment date (YYYY-MM-DD): ");
-        LocalDate date = LocalDate.parse(scanner.nextLine());
+        String dateInput = scanner.nextLine();
+        if (dateInput.isEmpty()) {
+            System.out.println("Error: Appointment date cannot be empty.");
+            return;
+        }
+        LocalDate date;
+        try {
+            date = LocalDate.parse(dateInput);
+        } catch (DateTimeParseException e) {
+            System.out.println("Error: Invalid date format. Please use YYYY-MM-DD.");
+            return;
+        }
 
         System.out.println("Available consultation times:");
         for (ConsultationTime time : ConsultationTime.values()) {
@@ -133,7 +165,18 @@ public class AppointmentApp {
         }
 
         System.out.print("Enter appointment time (HH:mm): ");
-        LocalTime time = LocalTime.parse(scanner.nextLine());
+        String timeInput = scanner.nextLine();
+        if (timeInput.isEmpty()) {
+            System.out.println("Error: Appointment time cannot be empty.");
+            return;
+        }
+        LocalTime time;
+        try {
+            time = LocalTime.parse(timeInput);
+        } catch (DateTimeParseException e) {
+            System.out.println("Error: Invalid time format. Please use HH:mm.");
+            return;
+        }
 
         if (!validateConsultationTime(date.getDayOfWeek(), time)) {
             System.out.println("Error: The selected date and time do not match any available consultation times.");
@@ -188,8 +231,9 @@ public class AppointmentApp {
     private static boolean validateConsultationTime(DayOfWeek dayOfWeek, LocalTime time) {
         for (ConsultationTime consultationTime : ConsultationTime.values()) {
             if (consultationTime.name().equals(dayOfWeek.name()) &&
-                (time.equals(consultationTime.getStartTime()) || time.equals(consultationTime.getEndTime()) ||
-                (time.isAfter(consultationTime.getStartTime()) && time.isBefore(consultationTime.getEndTime())))) {
+                    (time.equals(consultationTime.getStartTime()) || time.equals(consultationTime.getEndTime()) ||
+                            (time.isAfter(consultationTime.getStartTime())
+                                    && time.isBefore(consultationTime.getEndTime())))) {
                 return true;
             }
         }
