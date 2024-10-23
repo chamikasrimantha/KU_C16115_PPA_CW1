@@ -7,13 +7,7 @@ import java.util.*;
 
 import org.springframework.stereotype.Component;
 
-import lk.auroraskincare.clinic.entity.AppointmentEntity;
-import lk.auroraskincare.clinic.entity.ConsultationTime;
-import lk.auroraskincare.clinic.entity.DermatologistEntity;
-import lk.auroraskincare.clinic.entity.InvoiceEntity;
-import lk.auroraskincare.clinic.entity.PatientEntity;
-import lk.auroraskincare.clinic.entity.TreatmentEntity;
-import lk.auroraskincare.clinic.entity.TreatmentType;
+import lk.auroraskincare.clinic.entity.*;
 
 @Component
 public class AppointmentApp {
@@ -32,7 +26,7 @@ public class AppointmentApp {
         int choice;
 
         do {
-            System.out.println("\n--- Clinic Management System ---");
+            printHeader("Clinic Management System");
             System.out.println("1. Make Appointment");
             System.out.println("2. Update Appointment");
             System.out.println("3. View Appointments by Date");
@@ -40,36 +34,64 @@ public class AppointmentApp {
             System.out.println("5. Add Treatment");
             System.out.println("6. Generate Invoice");
             System.out.println("7. Exit");
-            System.out.print("Choose an option: ");
+            printLine();
+            System.out.print(" Choose an option: ");
             choice = scanner.nextInt();
             scanner.nextLine(); // Consume newline
 
             switch (choice) {
                 case 1:
+                    printSubHeader("Make Appointment");
                     makeAppointment(scanner);
                     break;
                 case 2:
+                    printSubHeader("Update Appointment");
                     updateAppointment(scanner);
                     break;
                 case 3:
+                    printSubHeader("View Appointments by Date");
                     viewAppointmentsByDate(scanner);
                     break;
                 case 4:
+                    printSubHeader("Search Appointment");
                     searchAppointment(scanner);
                     break;
                 case 5:
+                    printSubHeader("Add Treatment");
                     addTreatment(scanner);
                     break;
                 case 6:
+                    printSubHeader("Generate Invoice");
                     generateInvoice(scanner);
                     break;
                 case 7:
-                    System.out.println("Exiting...");
+                    System.out.println("Exiting... Thank you for using the system.");
                     break;
                 default:
                     System.out.println("Invalid choice. Please try again.");
             }
         } while (choice != 7);
+    }
+
+    // Utility function to print headers
+    private static void printHeader(String title) {
+        System.out.println("\n");
+        System.out.println("===============================================");
+        System.out.println("               " + title);
+        System.out.println("===============================================\n");
+    }
+
+    // Utility function to print sub-headers
+    private static void printSubHeader(String subTitle) {
+        System.out.println("\n");
+        System.out.println("-------------------------------------------------");
+        System.out.println("                 " + subTitle);
+        System.out.println("-------------------------------------------------");
+    }
+
+    // Utility function to print lines for cleaner separation
+    private static void printLine() {
+        System.out.println("-------------------------------------------------");
     }
 
     private static void initializeSampleData() {
@@ -105,7 +127,7 @@ public class AppointmentApp {
         System.out.print("Enter appointment date (YYYY-MM-DD): ");
         LocalDate date = LocalDate.parse(scanner.nextLine());
 
-        System.out.print("Available consultation times:\n");
+        System.out.println("Available consultation times:");
         for (ConsultationTime time : ConsultationTime.values()) {
             System.out.println(time.getTimeSlot());
         }
@@ -118,10 +140,11 @@ public class AppointmentApp {
             return;
         }
 
-        System.out.println("Select a dermatologist:");
+        System.out.println("\nSelect a dermatologist:");
         for (DermatologistEntity dermatologist : dermatologists) {
             System.out.println(dermatologist.getId() + ". " + dermatologist.getName());
         }
+        System.out.print("\nYour choice: ");
         Long dermatologistId = scanner.nextLong();
         scanner.nextLine(); // Consume newline
         DermatologistEntity selectedDermatologist = dermatologists.stream()
@@ -134,7 +157,7 @@ public class AppointmentApp {
             return;
         }
 
-        System.out.print("Accept registration fee of " + AppointmentEntity.getRegistrationFee() + " (yes/no)? ");
+        System.out.print("\nAccept registration fee of " + AppointmentEntity.getRegistrationFee() + " (yes/no)? ");
         String registrationFeeResponse = scanner.nextLine().toLowerCase();
 
         if (!registrationFeeResponse.equals("yes")) {
@@ -159,7 +182,7 @@ public class AppointmentApp {
         appointment.setRegistrationFeeAccepted(true);
         appointments.add(appointment);
 
-        System.out.println("Appointment made successfully.");
+        System.out.println("\nAppointment made successfully.");
     }
 
     private static boolean validateConsultationTime(DayOfWeek dayOfWeek, LocalTime time) {
@@ -173,11 +196,6 @@ public class AppointmentApp {
         return false;
     }
 
-    private static LocalTime convertTo24HourTime(String time) {
-        LocalTime localTime = LocalTime.parse(time);
-        return localTime; // Time is already in 24-hour format.
-    }
-
     private static void addTreatment(Scanner scanner) {
         System.out.print("Enter appointment ID to add treatment: ");
         Long appointmentId = scanner.nextLong();
@@ -189,10 +207,11 @@ public class AppointmentApp {
             return;
         }
 
-        System.out.println("Select a treatment to add:");
+        System.out.println("\nSelect a treatment to add:");
         for (TreatmentEntity treatment : treatments) {
             System.out.println(treatment.getId() + ". " + treatment.getTreatmentType());
         }
+        System.out.print("\nYour choice: ");
         Long treatmentId = scanner.nextLong();
         scanner.nextLine(); // Consume newline
         TreatmentEntity selectedTreatment = treatments.stream()
@@ -206,7 +225,7 @@ public class AppointmentApp {
         }
 
         appointment.setTreatmentEntity(selectedTreatment);
-        System.out.println("Treatment added to the appointment successfully.");
+        System.out.println("\nTreatment added to the appointment successfully.");
     }
 
     private static void updateAppointment(Scanner scanner) {
@@ -227,7 +246,7 @@ public class AppointmentApp {
 
         appointment.setDate(newDate);
         appointment.setTime(newTime);
-        System.out.println("Appointment updated successfully.");
+        System.out.println("\nAppointment updated successfully.");
     }
 
     private static void viewAppointmentsByDate(Scanner scanner) {
@@ -241,7 +260,7 @@ public class AppointmentApp {
         if (appointmentsOnDate.isEmpty()) {
             System.out.println("No appointments found for this date.");
         } else {
-            System.out.println("Appointments on " + date + ":");
+            printSubHeader("Appointments on " + date);
             for (AppointmentEntity appointment : appointmentsOnDate) {
                 System.out.println("Appointment ID: " + appointment.getId() +
                         ", Patient: " + appointment.getPatientEntity().getName() +
@@ -251,24 +270,52 @@ public class AppointmentApp {
     }
 
     private static void searchAppointment(Scanner scanner) {
-        System.out.print("Enter appointment ID or patient name: ");
-        String input = scanner.nextLine();
+        System.out.print("Search by (1) Name or (2) Appointment ID: ");
+        int searchOption = scanner.nextInt();
+        scanner.nextLine(); // Consume newline
 
+        switch (searchOption) {
+            case 1:
+                System.out.print("Enter patient name: ");
+                String name = scanner.nextLine();
+                searchAppointmentByName(name);
+                break;
+            case 2:
+                System.out.print("Enter appointment ID: ");
+                Long id = scanner.nextLong();
+                searchAppointmentById(id);
+                break;
+            default:
+                System.out.println("Invalid option.");
+        }
+    }
+
+    private static void searchAppointmentByName(String name) {
         List<AppointmentEntity> foundAppointments = appointments.stream()
-                .filter(a -> a.getId().toString().equals(input)
-                        || a.getPatientEntity().getName().equalsIgnoreCase(input))
+                .filter(a -> a.getPatientEntity().getName().equalsIgnoreCase(name))
                 .toList();
 
         if (foundAppointments.isEmpty()) {
-            System.out.println("No matching appointments found.");
+            System.out.println("No appointments found for the given name.");
         } else {
-            System.out.println("Matching Appointments:");
+            printSubHeader("Appointments for " + name);
             for (AppointmentEntity appointment : foundAppointments) {
                 System.out.println("Appointment ID: " + appointment.getId() +
-                        ", Patient: " + appointment.getPatientEntity().getName() +
                         ", Date: " + appointment.getDate() +
                         ", Time: " + appointment.getTime());
             }
+        }
+    }
+
+    private static void searchAppointmentById(Long id) {
+        AppointmentEntity appointment = findAppointmentById(id);
+        if (appointment == null) {
+            System.out.println("No appointment found for the given ID.");
+        } else {
+            printSubHeader("Appointment Details for ID " + id);
+            System.out.println("Patient: " + appointment.getPatientEntity().getName());
+            System.out.println("Date: " + appointment.getDate());
+            System.out.println("Time: " + appointment.getTime());
         }
     }
 
@@ -315,7 +362,7 @@ public class AppointmentApp {
         appointment.getInvoices().add(invoice);
 
         // Generate detailed invoice printout
-        System.out.println("\n--- Detailed Invoice ---");
+        printSubHeader("Invoice");
         System.out.println("Patient Name: " + appointment.getPatientEntity().getName());
         System.out.println("Patient Email: " + appointment.getPatientEntity().getEmail());
         System.out.println("Dermatologist: " + appointment.getDermatologistEntity().getName());
