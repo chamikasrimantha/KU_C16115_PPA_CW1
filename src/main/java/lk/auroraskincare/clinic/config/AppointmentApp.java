@@ -116,6 +116,12 @@ public class AppointmentApp {
         }
     }
 
+    /**
+     * Adds a new appointment to the system
+     * 
+     * @param scanner the appointment details to be added
+     */
+
     private static void makeAppointment(Scanner scanner) {
         System.out.print("Enter patient name: ");
         String name = scanner.nextLine();
@@ -228,6 +234,23 @@ public class AppointmentApp {
         System.out.println("\nAppointment made successfully.");
     }
 
+    /**
+     * Validates if the given time is within the consultation hours for a specified
+     * day of the week.
+     *
+     * This method iterates through all defined consultation times in the
+     * ConsultationTime enum and checks:
+     * 1. If the day of the week matches the consultation time's name.
+     * 2. If the time equals the start or end of the consultation period, or if it
+     * falls between these times.
+     *
+     * If any matching consultation time is found, it returns true; otherwise, it
+     * returns false.
+     *
+     * @param dayOfWeek The day of the week for validation.
+     * @param time      The time to validate against the consultation hours.
+     * @return True if the time is valid for the day, otherwise false.
+     */
     private static boolean validateConsultationTime(DayOfWeek dayOfWeek, LocalTime time) {
         for (ConsultationTime consultationTime : ConsultationTime.values()) {
             if (consultationTime.name().equals(dayOfWeek.name()) &&
@@ -301,6 +324,9 @@ public class AppointmentApp {
                 .filter(a -> a.getDate().isEqual(date))
                 .toList();
 
+        // Sort appointments using Bubble Sort before displaying
+        bubbleSortAppointments(appointmentsOnDate);
+
         if (appointmentsOnDate.isEmpty()) {
             System.out.println("No appointments found for this date.");
         } else {
@@ -309,6 +335,23 @@ public class AppointmentApp {
                 System.out.println("Appointment ID: " + appointment.getId() +
                         ", Patient: " + appointment.getPatientEntity().getName() +
                         ", Time: " + appointment.getTime());
+            }
+        }
+    }
+
+    private static void bubbleSortAppointments(List<AppointmentEntity> appointments) {
+        int n = appointments.size();
+        for (int i = 0; i < n - 1; i++) {
+            for (int j = 0; j < n - i - 1; j++) {
+                // Compare based on date first, then time
+                if (appointments.get(j).getDate().isAfter(appointments.get(j + 1).getDate()) ||
+                        (appointments.get(j).getDate().isEqual(appointments.get(j + 1).getDate()) &&
+                                appointments.get(j).getTime().isAfter(appointments.get(j + 1).getTime()))) {
+                    // Swap appointments
+                    AppointmentEntity temp = appointments.get(j);
+                    appointments.set(j, appointments.get(j + 1));
+                    appointments.set(j + 1, temp);
+                }
             }
         }
     }

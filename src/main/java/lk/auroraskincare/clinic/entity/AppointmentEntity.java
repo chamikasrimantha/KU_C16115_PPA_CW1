@@ -19,6 +19,12 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 
+/**
+ * Represents an appointment in the system, including details about
+ * the date, time, registration fee, patient, dermatologist and associated treatment. This class manages the
+ * validates of available consultation times.
+ */
+
 @Entity
 @Table(name = "appointment")
 public class AppointmentEntity {
@@ -36,6 +42,7 @@ public class AppointmentEntity {
 
     private boolean registrationFeeAccepted;
 
+    // many-to-one with patient entity
     @ManyToOne
     @JoinColumn(name = "patientId")
     private PatientEntity patientEntity;
