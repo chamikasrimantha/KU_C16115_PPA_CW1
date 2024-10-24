@@ -17,6 +17,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 
 /**
@@ -51,7 +52,7 @@ public class AppointmentEntity {
     @JoinColumn(name = "dermatologistId")
     private DermatologistEntity dermatologistEntity;
 
-    @ManyToOne
+    @OneToOne
     @JoinColumn(name = "treatmentId")
     private TreatmentEntity treatmentEntity;
 

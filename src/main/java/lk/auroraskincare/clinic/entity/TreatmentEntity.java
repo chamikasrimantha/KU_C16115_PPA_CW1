@@ -13,7 +13,9 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 
 @Entity
@@ -28,9 +30,13 @@ public class TreatmentEntity {
     @Enumerated(EnumType.STRING)
     private TreatmentType treatmentType;
 
-    @JsonIgnore
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "treatmentEntity", cascade = CascadeType.ALL)
-    private List<AppointmentEntity> appointments;
+    // @JsonIgnore
+    // @OneToMany(fetch = FetchType.LAZY, mappedBy = "treatmentEntity", cascade = CascadeType.ALL)
+    // private List<AppointmentEntity> appointments;
+
+    @OneToOne
+    @JoinColumn(name = "appointmentId")
+    private AppointmentEntity appointmentEntity;
 
     public Long getId() {
         return id;
