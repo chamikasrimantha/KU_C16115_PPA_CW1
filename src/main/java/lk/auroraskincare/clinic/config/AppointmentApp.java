@@ -122,35 +122,35 @@ public class AppointmentApp {
      * @param scanner the appointment details to be added
      */
 
-    private static void makeAppointment(Scanner scanner) {
+     private static void makeAppointment(Scanner scanner) {
         System.out.print("Enter patient name: ");
         String name = scanner.nextLine();
         if (name.isEmpty()) {
             System.out.println("Error: Patient name cannot be empty.");
             return;
         }
-
+    
         System.out.print("Enter patient NIC: ");
         String nic = scanner.nextLine();
         if (nic.isEmpty()) {
             System.out.println("Error: Patient NIC cannot be empty.");
             return;
         }
-
+    
         System.out.print("Enter patient email: ");
         String email = scanner.nextLine();
         if (email.isEmpty()) {
             System.out.println("Error: Patient email cannot be empty.");
             return;
         }
-
+    
         System.out.print("Enter patient phone number: ");
         String phone = scanner.nextLine();
         if (phone.isEmpty()) {
             System.out.println("Error: Patient phone number cannot be empty.");
             return;
         }
-
+    
         System.out.print("Enter appointment date (YYYY-MM-DD): ");
         String dateInput = scanner.nextLine();
         if (dateInput.isEmpty()) {
@@ -164,12 +164,12 @@ public class AppointmentApp {
             System.out.println("Error: Invalid date format. Please use YYYY-MM-DD.");
             return;
         }
-
+    
         System.out.println("Available consultation times:");
         for (ConsultationTime time : ConsultationTime.values()) {
             System.out.println(time.getTimeSlot());
         }
-
+    
         System.out.print("Enter appointment time (HH:mm): ");
         String timeInput = scanner.nextLine();
         if (timeInput.isEmpty()) {
@@ -183,12 +183,13 @@ public class AppointmentApp {
             System.out.println("Error: Invalid time format. Please use HH:mm.");
             return;
         }
-
+    
         if (!validateConsultationTime(date.getDayOfWeek(), time)) {
             System.out.println("Error: The selected date and time do not match any available consultation times.");
             return;
         }
-
+    
+        // Check if the time is already taken for the selected dermatologist
         System.out.println("\nSelect a dermatologist:");
         for (DermatologistEntity dermatologist : dermatologists) {
             System.out.println(dermatologist.getId() + ". " + dermatologist.getName());
@@ -200,20 +201,32 @@ public class AppointmentApp {
                 .filter(d -> d.getId().equals(dermatologistId))
                 .findFirst()
                 .orElse(null);
-
+    
         if (selectedDermatologist == null) {
             System.out.println("Invalid dermatologist selected.");
             return;
         }
-
+    
+        // Check if the selected dermatologist already has an appointment at the selected time
+        boolean isTimeTaken = appointments.stream().anyMatch(appointment ->
+                appointment.getDate().equals(date) &&
+                appointment.getTime().equals(time) &&
+                appointment.getDermatologistEntity().equals(selectedDermatologist)
+        );
+    
+        if (isTimeTaken) {
+            System.out.println("Error: The selected dermatologist already has an appointment at this time.");
+            return;
+        }
+    
         System.out.print("\nAccept registration fee of " + AppointmentEntity.getRegistrationFee() + " (yes/no)? ");
         String registrationFeeResponse = scanner.nextLine().toLowerCase();
-
+    
         if (!registrationFeeResponse.equals("yes")) {
             System.out.println("Appointment cancelled.");
             return;
         }
-
+    
         PatientEntity patient = new PatientEntity();
         patient.setId(patientIdCounter++);
         patient.setName(name);
@@ -221,7 +234,7 @@ public class AppointmentApp {
         patient.setEmail(email);
         patient.setPhone(phone);
         patients.add(patient);
-
+    
         AppointmentEntity appointment = new AppointmentEntity();
         appointment.setId(appointmentIdCounter++);
         appointment.setDate(date);
@@ -230,9 +243,9 @@ public class AppointmentApp {
         appointment.setDermatologistEntity(selectedDermatologist);
         appointment.setRegistrationFeeAccepted(true);
         appointments.add(appointment);
-
+    
         System.out.println("\nAppointment made successfully.");
-    }
+    }    
 
     /**
      * Validates if the given time is within the consultation hours for a specified
